@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Define your database models below
+model Payment {
+  id                 String   @id @default(uuid())
+  userId             String? // Handle anonymous buyers
+  amount             Float
+  currency           String
+  status             PaymentStatus @default(PENDING)
+  paymentMethod      PaymentMethod
+  provider           PaymentProvider
+  providerPaymentId  String?
+  orderId            String? // Linking to Order if available
+  installments       Installment[]
+
+  // Timestamps
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([providerPaymentId])
+}
+
+model Installment {
+  id String @id @default(uuid())
+  paymentId String
+  payment Payment @relation(references: [id], fields: [paymentId])
+   amount             Float
+  dueDate            DateTime
+  status             InstallmentStatus @default(PENDING)
+  // Timestamps
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  INITIATED
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CARD
+  INSTALLMENTS
+  COD
+}
+
+enum PaymentProvider {
+  STRIPE
+  TABBY
+  TAMARA
+  COD
+}
+
+enum InstallmentStatus {
+  PENDING
+  PAID
+  FAILED
+}
