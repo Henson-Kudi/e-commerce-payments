@@ -1,7 +1,7 @@
 import { PaymentProvider, PaymentStatus } from '@prisma/client';
 import { CreatePaymentDTO } from '../../../domain/dtos';
 import { Payment } from '../../../domain/entities';
-import { IMessageBroker } from '../../providers';
+import IMessageBroker from '../../providers';
 import IPaymentRepository from '../../repositories';
 import IUseCase from '../protocol';
 import { codPaymentCreated } from '../../../utils/kafkaTopics.json';
@@ -29,14 +29,10 @@ export default class CreateCODPayment implements IUseCase {
     try {
       await this.messageBroker.publish({
         topic: codPaymentCreated,
-        messages: [
-          {
-            value: JSON.stringify({
-              ...data, // we're passing metadata because it containes all information for order to be creted
-              paymentId: newPayment.id,
-            }),
-          },
-        ],
+        message: JSON.stringify({
+          ...data, // we're passing metadata because it containes all information for order to be creted
+          paymentId: newPayment.id,
+        }),
       });
     } catch (err) {
       logger.error((err as Error).message, err);

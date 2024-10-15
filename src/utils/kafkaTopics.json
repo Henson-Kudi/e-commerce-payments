@@ -18,5 +18,7 @@
   "tabbypaymentCreated": "tabbyPaymentCreated",
   "tabbyPaymentSucceeded": "tabbyPaymentSucceeded",
   "tabbyPaymentCancelled": "tabbyPaymentCancelled",
-  "tabbyPaymentFailed": "tabbyPaymentFailed"
+  "tabbyPaymentFailed": "tabbyPaymentFailed",
+
+  "orderCreated": "orderCreated"
 }

@@ -51,7 +51,8 @@ export const CreatePaymentDTOSchema = Joi.object({
           then: Joi.string().valid(PaymentProvider.COD),
         }),
       }),
-    }).required(),
+    })
+    .required(),
 
   providerPaymentId: Joi.string().optional().allow('').allow(null),
 

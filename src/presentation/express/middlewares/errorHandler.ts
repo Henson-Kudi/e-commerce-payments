@@ -74,9 +74,11 @@ const errorRequestHandler: ErrorRequestHandler = (err, req, res, next) => {
     });
   }
 
-  const error = err as Error
+  const error = err as Error;
 
-  return res.status(ResponseCodes.ServerError).json({ message: error.message, error });
+  return res
+    .status(ResponseCodes.ServerError)
+    .json({ message: error.message, error });
 };
 
 export default errorRequestHandler;

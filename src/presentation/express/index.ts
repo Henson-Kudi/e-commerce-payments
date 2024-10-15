@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import morgan from 'morgan';
 import { Server } from 'http';
 import router from './routes';
 import errorRequestHandler from './middlewares/errorHandler';
@@ -20,7 +19,11 @@ app.use(
 
 app.use(express.json());
 
-app.use(morgan('dev')); // morgan for api route logging
+// Add morgan for dev api route logging only
+if (envConf.NODE_ENV !== 'production') {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  app.use(require('morgan')('dev')); // morgan for api route logging
+}
 
 const baseUrl = '/api/v1/payments-service'; // change as you like
 
@@ -36,7 +39,7 @@ export default function startExpressServer(): {
 } {
   const server = app.listen(PORT, () => {
     // Better to use a logger instead of just logging to console
-    logger.info(`Server running on port http://localhost:${PORT}`);
+    logger.info(`Server running on: http://localhost:${PORT}`);
   });
 
   return {

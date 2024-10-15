@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import { CreatePaymentDTO } from '../../../domain/dtos';
 import IUseCase from '../protocol';
 import IPaymentRepository from '../../repositories';
-import { IMessageBroker } from '../../providers';
+import IMessageBroker from '../../providers';
 import { PaymentProvider, PaymentStatus } from '@prisma/client';
 import logger from '../../../utils/logger';
 import { Payment } from '../../../domain/entities';
@@ -34,14 +34,10 @@ export default class HandlePaymentCreatedEvent
     try {
       await this.messageBroker.publish({
         topic: stripePaymentCreated,
-        messages: [
-          {
-            value: JSON.stringify({
-              ...metadata, // we're passing metadata because it containes all information for order to be creted
-              paymentId: newPayment.id,
-            }),
-          },
-        ],
+        message: JSON.stringify({
+          ...metadata, // we're passing metadata because it containes all information for order to be creted
+          paymentId: newPayment.id,
+        }),
       });
     } catch (err) {
       logger.error((err as Error).message, err);
