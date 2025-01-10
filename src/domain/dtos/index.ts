@@ -59,19 +59,30 @@ export type UpdatePaymentDTO = {
   provider?: PaymentProvider;
   providerPaymentId?: string;
   orderId?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
 };
 
 export type FindPaymentsFilter = {
   id?: string | string[];
   userId?: string | string[];
-  amount?: number | number[];
+  amount?: {
+    min?: number;
+    max?: number;
+  };
   currency?: string | string[];
   status?: PaymentStatus | PaymentStatus[];
   paymentMethod?: PaymentMethod | PaymentMethod[];
   provider?: PaymentProvider | PaymentProvider[];
   providerPaymentId?: string | string[];
   orderId?: string | string[];
+  name?: string | string[];
+  email?: string | string[];
+  phone?: string | string[];
 };
+
 export type FindPaymentsOptions = {
-  withInstallmenst?: boolean;
+  withInstallments?: boolean;
+  withOrder?: boolean;
 } & PaginationOptions;

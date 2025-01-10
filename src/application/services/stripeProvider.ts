@@ -7,15 +7,14 @@ import HandlePaymentCreatedEvent from '../use-cases/stripe/handllePaytIntentCrea
 import HandlePaymentStatusChangeEvent from '../use-cases/stripe/handlePaymentStatusChangeEvent';
 import { PaymentStatus } from '@prisma/client';
 import {
-  stripePaymentFailed,
-  stripePaymentCancelled,
-  stripePaymentSucceeded,
+  paymentSuccess,
+  paymentFailed,
+  paymentCancelled,
 } from '../../utils/kafkaTopics.json';
 import logger from '../../utils/logger';
 
 export default class StripePaymentProvider
-  implements IPaymentProvider<Stripe.PaymentIntent>
-{
+  implements IPaymentProvider<Stripe.PaymentIntent> {
   private readonly stripe: Stripe;
 
   private readonly handlepaymentCreatedEvent: HandlePaymentCreatedEvent;
@@ -45,22 +44,22 @@ export default class StripePaymentProvider
   }
 
   async handlePaymentWebhook(req: RequestObject): Promise<void> {
-    const sig = req.headers!['stripe-signature'];
 
     const endpointSecret = envConf.stripeWebhookSecret;
 
     let event: Stripe.Event;
-    try {
-      event = this.stripe.webhooks.constructEvent(
-        req.body,
-        sig as string,
-        endpointSecret
-      );
-    } catch (err) {
-      throw new Error(
-        `Webhook signature verification failed: ${(err as Error).message}`
-      );
+
+    const sig = req.headers?.['stripe-signature'];
+
+    if (!sig) {
+      throw new Error('Stripe signature not found');
     }
+
+    event = this.stripe.webhooks.constructEvent(
+      req?.body,
+      sig,
+      endpointSecret
+    );
 
     const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
@@ -69,7 +68,7 @@ export default class StripePaymentProvider
         // Update payment record to success
         await this.handlePaymentStatusChangedEvent.execute({
           intent: paymentIntent,
-          kafkaTopic: stripePaymentSucceeded,
+          kafkaTopic: paymentSuccess,
           status: PaymentStatus.COMPLETED,
         });
         break;
@@ -77,7 +76,7 @@ export default class StripePaymentProvider
         // When payment failed, update payment record to fail
         await this.handlePaymentStatusChangedEvent.execute({
           intent: paymentIntent,
-          kafkaTopic: stripePaymentFailed,
+          kafkaTopic: paymentFailed,
           status: PaymentStatus.FAILED,
         });
         break;
@@ -91,7 +90,7 @@ export default class StripePaymentProvider
         // If payment intent is cancelled, then we want to update the payment to cancelled
         await this.handlePaymentStatusChangedEvent.execute({
           intent: paymentIntent,
-          kafkaTopic: stripePaymentCancelled,
+          kafkaTopic: paymentCancelled,
           status: PaymentStatus.CANCELLED,
         });
         break;

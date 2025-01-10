@@ -9,19 +9,18 @@ import { Payment } from '../../../domain/entities';
 
 export default class HandlePaymentStatusChangeEvent
   implements
-    IUseCase<
-      {
-        intent: Stripe.PaymentIntent;
-        status: PaymentStatus;
-        kafkaTopic: string;
-      },
-      Payment | null
-    >
-{
+  IUseCase<
+    {
+      intent: Stripe.PaymentIntent;
+      status: PaymentStatus;
+      kafkaTopic: string;
+    },
+    Payment | null
+  > {
   constructor(
     private readonly paymentsRepository: IPaymentRepository,
     private readonly messageBroker: IMessageBroker
-  ) {}
+  ) { }
 
   async execute(data: {
     intent: Stripe.PaymentIntent;
@@ -62,10 +61,11 @@ export default class HandlePaymentStatusChangeEvent
     });
 
     try {
-      await this.messageBroker.publish({
+      this.messageBroker.publish({
         topic: data.kafkaTopic,
         message: JSON.stringify({
           ...metadata, // we're passing metadata because it containes all information for order to be creted
+          status: updatedPayment.status,
           paymentId: updatedPayment.id,
         }),
       });

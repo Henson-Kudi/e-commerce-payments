@@ -23,6 +23,7 @@ type RequestObject = {
   xhr?: boolean;
   res?: any;
   device?: string;
+  [key:string]: any
 };
 
 export default RequestObject;

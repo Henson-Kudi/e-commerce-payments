@@ -13,8 +13,12 @@ export default class PaymentRepository implements IPaymentRepository {
   createPayment(payment: Prisma.PaymentCreateArgs): Promise<Payment> {
     return database.payment.create(payment);
   }
-  getPaymentById(paymentId: string): Promise<Payment | null> {
-    return database.payment.findUnique({ where: { id: paymentId } });
+  getPaymentById(paymentId: string, withInstallments?: boolean): Promise<Payment | null> {
+    return database.payment.findUnique({
+      where: { id: paymentId }, include: {
+        installments: withInstallments
+      }
+    });
   }
   getPayments(filter: Prisma.PaymentFindManyArgs): Promise<Payment[]> {
     return database.payment.findMany(filter);
@@ -24,5 +28,9 @@ export default class PaymentRepository implements IPaymentRepository {
   }
   deletePayment(paymentId: string): Promise<Payment> {
     return database.payment.delete({ where: { id: paymentId } });
+  }
+
+  countPayments(filter: Prisma.PaymentCountArgs): Promise<number> {
+    return database.payment.count(filter);
   }
 }

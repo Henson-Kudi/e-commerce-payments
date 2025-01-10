@@ -7,8 +7,10 @@ import PaymentRepository from '../../infrastructure/repositories';
 import { MessageBroker } from '../../infrastructure/providers';
 import HandlePaymentCreatedEvent from '../use-cases/stripe/handllePaytIntentCreatedEvent';
 import HandlePaymentStatusChangeEvent from '../use-cases/stripe/handlePaymentStatusChangeEvent';
-import { CreatePaymentDTO } from '../../domain/dtos';
+import { CreatePaymentDTO, FindPaymentsFilter, FindPaymentsOptions } from '../../domain/dtos';
 import validateCreatePaymentDTO from '../../utils/joi';
+import GetPaymentUsecase from '../use-cases/getPayment';
+import GetPaymentsUsecase from '../use-cases/getPayments';
 
 // This file should bring your usecases together. eg: userService could be a combination of all user related use cases
 export class PaymentService {
@@ -22,11 +24,13 @@ export class PaymentService {
     this.paymentsRepository,
     this.messageBroker
   );
+
   private readonly handlePaymentStatusChangedEvent =
     new HandlePaymentStatusChangeEvent(
       this.paymentsRepository,
       this.messageBroker
     );
+    
 
   private providers: {
     [key in keyof typeof PaymentProvider]?: IPaymentProvider;
@@ -61,6 +65,21 @@ export class PaymentService {
       throw new Error(`Payment provider ${providerName} not supported`);
 
     return provider.handlePaymentWebhook(req);
+  }
+
+  getPayments(query: {
+    filter?: FindPaymentsFilter;
+    options?: FindPaymentsOptions;
+  }) {
+    return new GetPaymentsUsecase(this.paymentsRepository).execute(query)
+  }
+
+  getPayment(query: {
+    id: string
+    userId?: string
+    withInstallments?: boolean
+  }) {
+    return new GetPaymentUsecase(this.paymentsRepository).execute(query)
   }
 }
 

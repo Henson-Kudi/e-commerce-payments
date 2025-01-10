@@ -1,24 +1,11 @@
 {
-  "paymentUpdated": "paymentUpdated",
-  "paymentCreated": "paymentCreated",
-  "paymentDeleted": "paymentDeleted",
-  "paymentCancelled": "paymentCancelled",
-  "paymentsDeleted": "orderesDeleted",
+  "paymentUpdated": "payment.updated",
+  "paymentCreated": "payment.created",
+  "paymentDeleted": "payment.deleted",
+  "paymentCancelled": "payment.cancelled",
+  "paymentSuccess": "payment.success",
+  "paymentFailed": "payment.failed",
+  "paymentsDeleted": "payment.deleted",
 
-  "stripePaymentCreated": "stripePaymentCreated",
-  "stripePaymentSucceeded": "stripePaymentSucceeded",
-  "stripePaymentCancelled": "stripePaymentCancelled",
-  "stripePaymentFailed": "stripePaymentFailed",
-
-  "codPaymentCreated": "codPaymentCreated",
-  "codPaymentSucceeded": "codPaymentSucceeded",
-  "codPaymentCancelled": "codPaymentCancelled",
-  "codPaymentFailed": "codPaymentFailed",
-
-  "tabbypaymentCreated": "tabbyPaymentCreated",
-  "tabbyPaymentSucceeded": "tabbyPaymentSucceeded",
-  "tabbyPaymentCancelled": "tabbyPaymentCancelled",
-  "tabbyPaymentFailed": "tabbyPaymentFailed",
-
-  "orderCreated": "orderCreated"
+  "orderCreated": "order.created"
 }

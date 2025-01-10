@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import { Server } from 'http';
 import router from './routes';
@@ -11,13 +11,25 @@ const app = express();
 
 const PORT = envConf.PORT;
 
+const baseUrl = '/api/v1/payments-service'; // change as you like
+
 app.use(
   cors({
-    origin: '*', //Manage cors as you want
+    origin: (req, cb) => cb(null, true), //Manage cors as you want
   })
 );
 
-app.use(express.json());
+
+const rawBodyMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  if (req.originalUrl === '/api/v1/payments-service/webhook/stripe') {
+    next();
+  } else {
+    // For all other routes, use regular json middleware
+    express.json()(req, res, next);
+  }
+};
+
+app.use(rawBodyMiddleware)
 
 // Add morgan for dev api route logging only
 if (envConf.NODE_ENV !== 'production') {
@@ -25,7 +37,6 @@ if (envConf.NODE_ENV !== 'production') {
   app.use(require('morgan')('dev')); // morgan for api route logging
 }
 
-const baseUrl = '/api/v1/payments-service'; // change as you like
 
 //
 app.use(`${baseUrl}`, router);

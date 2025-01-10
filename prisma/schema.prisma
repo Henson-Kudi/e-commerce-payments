@@ -17,6 +17,9 @@ datasource db {
 model Payment {
   id                 String   @id @default(uuid())
   userId             String? // Handle anonymous buyers
+  name               String?
+  email              String?
+  mobile             String?
   amount             Float
   currency           String
   status             PaymentStatus @default(PENDING)

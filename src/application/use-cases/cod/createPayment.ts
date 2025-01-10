@@ -4,14 +4,14 @@ import { Payment } from '../../../domain/entities';
 import IMessageBroker from '../../providers';
 import IPaymentRepository from '../../repositories';
 import IUseCase from '../protocol';
-import { codPaymentCreated } from '../../../utils/kafkaTopics.json';
+import { paymentCreated } from '../../../utils/kafkaTopics.json';
 import logger from '../../../utils/logger';
 
 export default class CreateCODPayment implements IUseCase {
   constructor(
     private readonly paymentsRepository: IPaymentRepository,
     private readonly messageBroker: IMessageBroker
-  ) {}
+  ) { }
 
   async execute(data: CreatePaymentDTO): Promise<Payment> {
     const newPayment = await this.paymentsRepository.createPayment({
@@ -24,11 +24,14 @@ export default class CreateCODPayment implements IUseCase {
         providerPaymentId: null,
         paymentMethod: data.paymentMethod,
         provider: PaymentProvider.COD,
+        email: data.userEmail,
+        mobile: data.userPhone,
+        name: data.userName,
       },
     });
     try {
       await this.messageBroker.publish({
-        topic: codPaymentCreated,
+        topic: paymentCreated,
         message: JSON.stringify({
           ...data, // we're passing metadata because it containes all information for order to be creted
           paymentId: newPayment.id,
